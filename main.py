@@ -1,10 +1,15 @@
 ### Do fun stuff with FPL data !
 import requests
 import pandas as pd
+import numpy as np
+import os
 
 base_url = 'https://fantasy.premierleague.com/api/'
 
-# League id 
+
+# 1. Get data
+
+## League id 
 
 def get_league_id(league_name):
     league_ids = {
@@ -17,7 +22,7 @@ def get_league_id(league_name):
     except KeyError:
         print('Please enter a valid league name', league_ids.keys)
 
-# Manager data
+## Manager data
 
 def get_league_manager_id(league_id:int):
     '''get manager ids from a classic league'''
@@ -52,12 +57,12 @@ def get_manager_transfers(manager_id:int, gw_no:int) -> dict:
     assert r.status_code == 200, r.status_code
     return r.json() 
 
-# Player data
+## Player data
 
 def get_players():
     return pd.read_csv('data/player_idlist.csv')
 
-# GW Points data
+## GW Points data
 
 def get_gw_points(league_id, gw_no):
     manager_ids = get_league_manager_id(league_id)
@@ -82,7 +87,7 @@ def get_gw_points(league_id, gw_no):
     df['rank'] = df['h2h_points'].rank(method='dense', ascending=False).astype(int)
     return df.sort_values(by='rank', ascending=True)
 
-# GW Picks data
+## GW Picks data
 
 def get_gw_picks(league_id, gw_no):
     '''Returns a dataframe of selected players.'''
@@ -104,13 +109,15 @@ def get_gw_transfers(league_id, gw_no):
     '''Returns a dataframe of transfers and the count of how many.'''
     pass
 
-# GW Ranking calculations for weekly local leagues
+# 2. PNL calc
 
 def get_gw_weekly_pnl(gw, league_name:str):
     if league_name == 'rbsc':
         return pnl_rbsc(gw)
     elif league_name == 'ifc':
         return pnl_ifc(gw)
+    elif league_name == 'rpk':
+        return pnl_rpk(gw)
     
 ## RBSC
 def pnl_rbsc(gw:pd.DataFrame):
@@ -137,7 +144,7 @@ def pnl_rbsc(gw:pd.DataFrame):
         pnl[max_index] = -500
     # assemble resulting dataframe and return
     gw['pnl'] = pnl
-    return gw[gw.pnl != 0]
+    return gw
 
 ## IFC
 def pnl_ifc(gw:pd.DataFrame):
@@ -164,23 +171,90 @@ def pnl_ifc(gw:pd.DataFrame):
         pnl[max_index] = -100
     # assemble resulting dataframe and return
     gw['pnl'] = pnl
-    return gw[gw.pnl != 0]
+    return gw
 
 ## Respect Kruwai
-# TODO
+def unique_rank_pnl(ranks:list):
+    pnl = []
+    for i in ranks:
+        if i == 1:
+            pnl.append(300)
+        elif i == 2:
+            pnl.append(200)
+        elif i == 3:
+            pnl.append(100)
+        elif i == 4:
+            pnl.append(-100)
+        elif i == 5:
+            pnl.append(-200)
+        elif i == 6:
+            pnl.append(-300)
+    return pnl
 
+def get_winners_ratios_equal_rank(winners_ranks):
+    winners_ranks = list(sorted(winners_ranks))
+    if winners_ranks == [1,2,3]:
+        return {1:3/6, 2:2/6, 3:1/6}
+    elif winners_ranks == [1,2,2]:
+        return {1:6/12, 2:3/12}
+    elif winners_ranks == [1,1,2]:
+        return {1:5/12, 2:2/12}
+    elif winners_ranks == [1,1,1]:
+        return {1:4/12}
+    elif winners_ranks == [1,2]:
+        return {1:8/12, 2:4/12}
+    elif winners_ranks == [1,1]:
+        return {1:1/2}
+    elif winners_ranks == [1]:
+        return {1:1}
 
+def equal_rank_pnl(ranks:list):
+    max_rank = max(ranks)
+    assert max_rank > 3, 'Max rank < 3 not applicable for this logic'
+    pnl = [0]*len(ranks)
 
-# Create dataframe for EDA on season long rankings -> เพราะเราใช้ sql น่าจะง่ายกว่า ใช้ api เพื่อดึงข้อมูลมาทำเป็นตารางให้ได้พอ
+    # losers
+    for i in range(len(ranks)):
+        if ranks[i] == max_rank:
+            pnl[i] = -300
+        elif ranks[i] == max_rank - 1:
+            pnl[i] = -200
+        elif ranks[i] == max_rank - 2:
+            pnl[i] = -100
+
+    # winners 
+    total_prize = sum(pnl) * -1
+    # get sorted list of winners' rank
+    winners_ranks = [ranks[i] for i in range(len(ranks)) if ranks[i] < max_rank - 2]
+    winners_ratio = get_winners_ratios_equal_rank(winners_ranks)
+    for i in range(len(pnl)):
+        if pnl[i] == 0:
+            pnl[i] = round(winners_ratio[ranks[i]] * total_prize)
+    assert sum(pnl) == 0
+    return pnl
+
+def pnl_rpk(gw):
+    gw = gw.copy()
+    if max(gw['rank']) == len(gw):
+        gw['is_unique_rank'] = True
+        gw['pnl'] = unique_rank_pnl(list(gw['rank']))
+    else:
+        gw['is_unique_rank'] = False
+        try:
+            gw['pnl'] = equal_rank_pnl(list(gw['rank']))   
+        except:
+            gw['pnl'] = np.nan
+    return gw
+
+# 3. Data writing
+def write_gw(gw:pd.DataFrame, league_name:str):
+    '''write gw data to csv file'''
+    location = "data"+"/"+league_name+"/"
+    filename = "fact_gw_"+league_name+".csv"
+    filepath = location+filename
+    gw.to_csv(filepath, index=False)
+    print(f"DataFrame successfully saved to {filepath}")
+
 
 if __name__ == '__main__':
-    # ไป eda ต่อเล่น ใน jupyter แล้ว ถ้าชอบอะไรค่อยมาสร้างเป็น function visualizations.py แยกอีกทีได้
-    # args
-    gw_no = 10
-    league_name = 'rbsc'
-    # main
-    league_id = get_league_id(league_name)
-    gw = get_gw_points(league_id, gw_no)
-    pnl = get_gw_weekly_pnl(gw, league_name)
-    # picks = get_gw_picks(gw_no)
-    print('yo')
+    pass
