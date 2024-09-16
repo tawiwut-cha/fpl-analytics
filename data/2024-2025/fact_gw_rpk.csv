@@ -1,0 +1,33 @@
+manager_id,team_name,name,gw_no,points,transfers_cost,h2h_points,rank,pnl,is_unique_rank
+1576908,Chicks Casino CF,Tawiwut Charuwat,1,87,0,87,1,300,True
+3611665,TachaponR,Tachapon Ratsameedara,1,75,0,75,2,200,True
+4329910,proove.club,Natthawat Charoenkitmongkol,1,72,0,72,3,100,True
+7348222,Sirawatd,sirawat dulyavit,1,67,0,67,4,0,True
+5377619,PTHOMAS FC,PHOOM T. YENBAMROONG,1,66,0,66,5,0,True
+2910243,Morty FC,Pattapong Charoenchaipong,1,65,0,65,6,-100,True
+5961532,Aekk72,Atthapon Parkart,1,58,0,58,7,-200,True
+3607641,OnkaewmaneeN.,Nithiz Onkaewmanee,1,50,0,50,8,-300,True
+4329910,proove.club,Natthawat Charoenkitmongkol,2,96,0,96,1,300,False
+3607641,OnkaewmaneeN.,Nithiz Onkaewmanee,2,85,0,85,2,200,False
+5961532,Aekk72,Atthapon Parkart,2,79,0,79,3,50,False
+3611665,TachaponR,Tachapon Ratsameedara,2,79,0,79,3,50,False
+7348222,Sirawatd,sirawat dulyavit,2,78,0,78,4,0,False
+2910243,Morty FC,Pattapong Charoenchaipong,2,72,0,72,5,-100,False
+5377619,PTHOMAS FC,PHOOM T. YENBAMROONG,2,67,0,67,6,-200,False
+1576908,Chicks Casino CF,Tawiwut Charuwat,2,60,0,60,7,-300,False
+5961532,Aekk72,Atthapon Parkart,3,93,0,93,1,300,False
+3611665,TachaponR,Tachapon Ratsameedara,3,74,0,74,2,150,False
+2910243,Morty FC,Pattapong Charoenchaipong,3,74,0,74,2,150,False
+1576908,Chicks Casino CF,Tawiwut Charuwat,3,73,0,73,3,0,False
+5377619,PTHOMAS FC,PHOOM T. YENBAMROONG,3,71,0,71,4,0,False
+7348222,Sirawatd,sirawat dulyavit,3,68,0,68,5,-100,False
+4329910,proove.club,Natthawat Charoenkitmongkol,3,62,0,62,6,-200,False
+3607641,OnkaewmaneeN.,Nithiz Onkaewmanee,3,53,0,53,7,-300,False
+7348222,Sirawatd,sirawat dulyavit,4,60,0,60,1,300,True
+3607641,OnkaewmaneeN.,Nithiz Onkaewmanee,4,55,0,55,2,200,True
+5377619,PTHOMAS FC,PHOOM T. YENBAMROONG,4,48,0,48,3,100,True
+5961532,Aekk72,Atthapon Parkart,4,47,0,47,4,0,True
+3611665,TachaponR,Tachapon Ratsameedara,4,46,0,46,5,0,True
+4329910,proove.club,Natthawat Charoenkitmongkol,4,40,0,40,6,-100,True
+2910243,Morty FC,Pattapong Charoenchaipong,4,36,0,36,7,-200,True
+1576908,Chicks Casino CF,Tawiwut Charuwat,4,35,0,35,8,-300,True
