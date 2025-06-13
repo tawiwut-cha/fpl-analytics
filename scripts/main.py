@@ -3,9 +3,10 @@ import requests
 import pandas as pd
 import numpy as np
 import os
+from dotenv import load_dotenv
 
 base_url = 'https://fantasy.premierleague.com/api/'
-
+load_dotenv()
 
 # 1. Get data
 
@@ -16,16 +17,16 @@ def get_gw_status(gw_no:int):
     return None
 
 ## League id
-def get_league_id(league_name):
-    league_ids = {
-        'rbsc': 584167,
-        'rpk': 748775,
-        'ifc': 898742,
-    }
-    try:
-        return league_ids[league_name]
-    except KeyError:
-        print('Please enter a valid league name', league_ids.keys)
+def get_league_id(league_name: str) -> int:
+    '''
+    Get league id from env variables
+    '''
+    env_var = f"LEAGUE_ID_{league_name.upper()}"
+    value = os.getenv(env_var)
+    if value:
+        return int(value)
+    else:
+        raise ValueError(f"Invalid league name: {league_name}. Did you set {env_var} in .env?")
 
 ## Player data
 def get_dim_players():
