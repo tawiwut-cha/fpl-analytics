@@ -10,6 +10,15 @@ def get_data_dir(league_name: str) -> str:
     os.makedirs(path, exist_ok=True)
     return path
 
+def read_gw_raw(league_name: str, gw_no: int):
+    """
+    Reads data from csv file as pd Dataframe for further usage
+    """
+    folder = get_data_dir(league_name)
+    filename = f"gw{gw_no:02d}_raw.csv"
+    filepath = os.path.join(folder, filename)
+    return pd.read_csv(filepath)
+
 def write_gw_raw(gw_df: pd.DataFrame, league_name: str, gw_no: int):
     """
     Saves the raw gameweek data before PnL calculation.
