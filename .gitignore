@@ -1,5 +1,6 @@
 # Ignore all data files (but keep the folder structure)
 data/*
+!data/archive
 !data/.gitkeep
 
 # Python cache and compiled files
