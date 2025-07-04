@@ -21,8 +21,8 @@ def generate_weekly_pnl_report(league_name, gw_no):
     winners = df[df["pnl"] > 0].sort_values("pnl", ascending=False)
     losers = df[df["pnl"] < 0].sort_values("pnl")
 
-    # Format each line with +/- sign and 1 decimal
-    format_line = lambda row: f"{row['pnl']:+.0f} - {row['name']} ({row['full_name']})"
+    # Format each line
+    format_line = lambda row: f"{row['pnl']:+.0f}: {row['name']} ({row['full_name']}) {row['points']} - {row['transfers_cost']} = {row['h2h_points']} pts"
 
     # Build message lines
     lines = []

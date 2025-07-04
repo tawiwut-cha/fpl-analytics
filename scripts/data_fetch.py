@@ -59,18 +59,6 @@ def get_league_id(league_name: str) -> int:
         raise ValueError(f"Invalid league name: {league_name}. Did you set {env_var} in .env?")
 
 
-def get_dim_players() -> pd.DataFrame:
-    """
-    Get metadata for all players (e.g., name, team, position, price).
-    
-    Returns:
-        pd.DataFrame: DataFrame of player information.
-    """
-    r = requests.get(base_url + 'bootstrap-static/')
-    r.raise_for_status()
-    return pd.DataFrame(r.json()['elements'])
-
-
 def get_manager_info(manager_id: int) -> dict:
     """
     Fetch basic information about a manager.
@@ -130,6 +118,17 @@ def get_dim_managers(league_id: int) -> pd.DataFrame:
         data.append(manager_info)
     return pd.DataFrame(data)
 
+def get_dim_players() -> pd.DataFrame:
+    """
+    Get metadata for all players (e.g., name, team, position, price).
+    
+    Returns:
+        pd.DataFrame: DataFrame of player information.
+    """
+    r = requests.get(base_url + 'bootstrap-static/')
+    r.raise_for_status()
+    return pd.DataFrame(r.json()['elements'])
+
 
 def get_manager_picks(manager_id: int, gw_no: int) -> dict:
     """
@@ -147,41 +146,41 @@ def get_manager_picks(manager_id: int, gw_no: int) -> dict:
     return r.json()
 
 
-def get_manager_transfers(manager_id: int, gw_no: int) -> dict:
-    """
-    Get a manager's transfer activity for a given gameweek.
+# def get_manager_transfers(manager_id: int, gw_no: int) -> dict:
+#     """
+#     Get a manager's transfer activity for a given gameweek.
     
-    Parameters:
-        manager_id (int): Manager entry ID.
-        gw_no (int): Gameweek number (unused in API but kept for signature consistency).
+#     Parameters:
+#         manager_id (int): Manager entry ID.
+#         gw_no (int): Gameweek number (unused in API but kept for signature consistency).
     
-    Returns:
-        dict: List of transfer activities.
-    """
-    r = requests.get(f"{base_url}entry/{manager_id}/transfers/")
-    r.raise_for_status()
-    return r.json()
+#     Returns:
+#         dict: List of transfer activities.
+#     """
+#     r = requests.get(f"{base_url}entry/{manager_id}/transfers/")
+#     r.raise_for_status()
+#     return r.json()
 
 
-def get_gw_picks(league_id: int, gw_no: int) -> pd.DataFrame:
-    """
-    Aggregate the picks (selected players) for all managers in a league.
+# def get_gw_picks(league_id: int, gw_no: int) -> pd.DataFrame:
+#     """
+#     Aggregate the picks (selected players) for all managers in a league.
     
-    Parameters:
-        league_id (int): League ID.
-        gw_no (int): Gameweek number.
+#     Parameters:
+#         league_id (int): League ID.
+#         gw_no (int): Gameweek number.
     
-    Returns:
-        pd.DataFrame: Picks data with manager labels.
-    """
-    manager_ids = get_league_manager_id(league_id)
-    gw_picks = []
-    for manager_id in manager_ids:
-        picks = get_manager_picks(manager_id, gw_no)['picks']
-        for pick in picks:
-            pick['manager_id'] = manager_id
-        gw_picks.extend(picks)
-    return pd.DataFrame(gw_picks)
+#     Returns:
+#         pd.DataFrame: Picks data with manager labels.
+#     """
+#     manager_ids = get_league_manager_id(league_id)
+#     gw_picks = []
+#     for manager_id in manager_ids:
+#         picks = get_manager_picks(manager_id, gw_no)['picks']
+#         for pick in picks:
+#             pick['manager_id'] = manager_id
+#         gw_picks.extend(picks)
+#     return pd.DataFrame(gw_picks)
 
 
 def get_gw_points(league_id: int, gw_no: int) -> pd.DataFrame:
@@ -198,21 +197,18 @@ def get_gw_points(league_id: int, gw_no: int) -> pd.DataFrame:
     manager_ids = get_league_manager_id(league_id)
     data = {
         'manager_id': manager_ids,
-        # 'team_name': [],
-        # 'name': [],
         'gw_no': [gw_no] * len(manager_ids),
         'points': [],
         'transfers_cost': [],
-        # 'h2h_points': []
+        'active_chip': [],
+        'points_on_bench': [],
     }
     for manager_id in manager_ids:
-        # manager = get_manager_info(manager_id)
-        # data['team_name'].append(manager['name'])
-        # data['name'].append(f"{manager['player_first_name']} {manager['player_last_name']}")
         picks = get_manager_picks(manager_id, gw_no)
         data['points'].append(picks['entry_history']['points'])
         data['transfers_cost'].append(picks['entry_history']['event_transfers_cost'])
-        # data['h2h_points'].append(picks['entry_history']['points'] - picks['entry_history']['event_transfers_cost'])
+        data['active_chip'].append(picks['active_chip'])
+        data['points_on_bench'].append(picks['entry_history']['points_on_bench'])
     df = pd.DataFrame(data)
     # df['rank'] = df['h2h_points'].rank(method='dense', ascending=False).astype(int)
     # return df.sort_values(by='rank')

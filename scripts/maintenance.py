@@ -11,6 +11,16 @@ def update_dim_managers(league_name: str):
     # write dim manager to data folder
     write_dim_managers(dim_managers, league_name)
 
-if __name__ == "__main__":
+def main():
+    """
+    I want to run this function after deadline but before gw ends to get ready
+    - update managers in league
+    - update player names (in case of transfers)
+    - get manager picks / captaincy / chips ?
+    - can use trigger time from gw_status to run
+    """
     for league_name in ['rpk', 'ifc', 'rbsc']:
         update_dim_managers(league_name)
+
+if __name__ == "__main__":
+    main()
