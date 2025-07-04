@@ -1,8 +1,6 @@
 import argparse
-import sys
-import pandas as pd
 from data_fetch import get_gw_finished_status, get_league_id, get_gw_points
-from data_write import write_gw_raw, read_gw_raw, write_gw_analyzed
+from data_read_write import write_gw_raw, read_gw_raw, write_gw_analyzed
 from data_analyze import calc_weekly_pnl
 
 def run_weekly_fetch_raw(league_name: str, gw_no: int):
