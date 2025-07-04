@@ -1,3 +1,4 @@
-https://www.game-change.co.uk/2023/02/10/a-complete-guide-to-the-fantasy-premier-league-fpl-api/
 https://medium.com/analytics-vidhya/getting-started-with-fantasy-premier-league-data-56d3b9be8c32
 https://github.com/vaastav/Fantasy-Premier-League/tree/master
+https://documenter.getpostman.com/view/2622548/Szme4dhH#intro
+https://fpl.readthedocs.io/en/latest/user/quickstart.html
