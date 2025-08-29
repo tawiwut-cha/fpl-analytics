@@ -26,7 +26,7 @@ def generate_weekly_pnl_report(league_name, gw_no):
 
     # Build message lines
     lines = []
-    lines.append(f"📊 GW{gw_no:02d} PnL Highlights\n")
+    lines.append(f"📊 GW{gw_no:02d} H2H results\n")
 
     if not winners.empty:
         lines.append("💰 Winners:")
