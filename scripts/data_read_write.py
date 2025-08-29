@@ -6,7 +6,7 @@ def get_data_dir(league_name: str) -> str:
     Returns the directory path for saving data based on the league name.
     Automatically creates the folder if it doesn't exist.
     """
-    path = os.path.join('data', '2024-2025', league_name)
+    path = os.path.join('data', '2025-2026', league_name)
     os.makedirs(path, exist_ok=True)
     return path
 
@@ -15,7 +15,7 @@ def get_report_dir(league_name: str) -> str:
     Returns the directory path for saving reports based on the league name.
     Automatically creates the folder if it doesn't exist.
     """
-    path = os.path.join('outputs', '2024-2025', 'report', league_name)
+    path = os.path.join('outputs', '2025-2026', 'report', league_name)
     os.makedirs(path, exist_ok=True)
     return path
 
