@@ -112,10 +112,18 @@ def get_dim_managers(league_id: int) -> pd.DataFrame:
     data = []
     for manager_id in manager_ids:
         manager_info = get_manager_info(manager_id)
-        manager_info.pop('entered_events', None)
-        manager_info.pop('leagues', None)
-        manager_info.pop('kit', None)
-        data.append(manager_info)
+        keys_to_keep = {
+            'id',
+            'player_first_name',
+            'player_last_name',
+            'name',
+            'entered_events',
+            'last_deadline_bank',
+            'last_deadline_value',
+            'last_deadline_total_transfers'
+        }
+        filtered_manager_info = {k: v for k, v in manager_info.items() if k in keys_to_keep}
+        data.append(filtered_manager_info)
     return pd.DataFrame(data)
 
 def get_dim_players() -> pd.DataFrame:
