@@ -19,7 +19,7 @@ def main():
     - get manager picks / captaincy / chips ?
     - can use trigger time from gw_status to run
     """
-    for league_name in ['rpk', 'ifc', 'rbsc']:
+    for league_name in ['rbsc', 'ifc', 'rpk']:
         update_dim_managers(league_name)
 
 if __name__ == "__main__":
