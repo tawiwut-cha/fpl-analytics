@@ -77,10 +77,26 @@ def pnl_ifc(gw:pd.DataFrame):
 
 def pnl_rpk(gw):
     gw = gw.copy()
-    if max(gw['rank']) == len(gw):
-        gw['pnl'] = [300,200,100,0,0,-100,-200,-300] # hardcode
-        gw['is_unique_rank'] = True
-    else:
-        gw['pnl'] = np.nan
-        gw['is_unique_rank'] = False
+    # find manager_id rank of winners and losers
+    rank = list(gw['rank'])
+    max_rank = max(rank)
+    min_rank = min(rank)
+    max_indices = []
+    min_indices = []
+    for i in range(len(rank)):
+        if rank[i] >= max_rank - 2:
+            max_indices.append(i)
+        elif rank[i] == min_rank:
+            min_indices.append(i)
+    # assign pnl
+    pnl = [0] * len(rank)
+    prize = len(max_indices) * 100
+    for min_index in min_indices:
+        # winner(s)
+        pnl[min_index] = round(prize / len(min_indices))
+    for max_index in max_indices:
+        # loser(s)
+        pnl[max_index] = -100
+    # assemble resulting dataframe and return
+    gw['pnl'] = pnl
     return gw
