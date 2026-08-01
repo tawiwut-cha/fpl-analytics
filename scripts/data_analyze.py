@@ -4,20 +4,40 @@
 import pandas as pd
 import numpy as np
 
+
 def calc_weekly_pnl(gw_points: pd.DataFrame, league_name: str):
     gw = gw_points.copy()
-    # calc h2h points
-    gw['h2h_points'] = gw['points'] - gw['transfers_cost']
-    # rank
-    gw['rank'] = gw['h2h_points'].rank(method='dense', ascending=False).astype(int)
-    gw = gw.sort_values(by='rank', ascending=True)
-    # apply pnl logic based on rank
-    if league_name == 'rbsc':
-        return pnl_rbsc(gw)
+    
+    # 1. Separate Active vs Inactive
+    # Assuming 'points' is 0 for those who haven't joined
+    active_mask = gw['points'] > 0
+    active_managers = gw[active_mask].copy()
+    inactive_managers = gw[~active_mask].copy()
+    
+    # 2. Process Ranking only for Active managers
+    active_managers['h2h_points'] = active_managers['points'] - active_managers['transfers_cost']
+    active_managers['rank'] = active_managers['h2h_points'].rank(method='dense', ascending=False).astype(int)
+    
+    # 3. Apply PnL logic only to the active subset
+    if league_name in {'rbsc', 'bpat', 'balo', 'ytce', 'jmkb'}:
+        processed_active = pnl_rbsc(active_managers)
+    # ... other leagues ...
     elif league_name == 'ifc':
-        return pnl_ifc(gw)
+        processed_active = pnl_ifc(gw)
     elif league_name == 'rpk':
-        return pnl_rpk(gw)
+        processed_active = pnl_rpk(gw)
+    
+    # 4. Set PnL to 0 for inactive managers and clear their rank
+    inactive_managers['pnl'] = 0
+    inactive_managers['rank'] = 9999  # Assign a high number to push to bottom
+    
+    # 5. Combine back together
+    result = pd.concat([processed_active, inactive_managers])
+    
+    # 6. Sort by rank so the active ones are on top, inactive on bottom
+    result = result.sort_values(by='rank', ascending=True)
+
+    return result
     
 ## RBSC
 def pnl_rbsc(gw:pd.DataFrame):

@@ -9,7 +9,9 @@ fi
 
 GW=$1
 
-for LEAGUE in rbsc rpk ifc
+LEAGUES=("rbsc" "rpk" "ifc")
+
+for LEAGUE in "${LEAGUES[@]}"
 do
     echo "Running main.py for league=$LEAGUE, gw=$GW..."
     python scripts/main.py --league "$LEAGUE" --gw "$GW"

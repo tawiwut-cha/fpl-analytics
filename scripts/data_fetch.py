@@ -141,17 +141,27 @@ def get_dim_players() -> pd.DataFrame:
 def get_manager_picks(manager_id: int, gw_no: int) -> dict:
     """
     Get a manager's selected squad for a given gameweek.
-    
-    Parameters:
-        manager_id (int): Manager entry ID.
-        gw_no (int): Gameweek number.
-    
-    Returns:
-        dict: Picks and entry history.
+    Returns None if the manager entry/picks are not found.
     """
-    r = requests.get(f"{base_url}entry/{manager_id}/event/{gw_no}/picks/")
-    r.raise_for_status()
-    return r.json()
+    url = f"{base_url}entry/{manager_id}/event/{gw_no}/picks/"
+    
+    try:
+        r = requests.get(url)
+        r.raise_for_status()
+        return r.json()
+        
+    except requests.exceptions.HTTPError as err:
+        # Check if it's a 404 error (Not Found)
+        if err.response.status_code == 404:
+            print(f"Skipping: Manager {manager_id} not found for GW {gw_no} (likely joined late).")
+            return None
+        else:
+            # Re-raise if it's a different HTTP error (e.g., 500, 403)
+            raise
+            
+    except requests.exceptions.RequestException as e:
+        print(f"Network error occurred: {e}")
+        return None
 
 
 # def get_manager_transfers(manager_id: int, gw_no: int) -> dict:
@@ -194,30 +204,38 @@ def get_manager_picks(manager_id: int, gw_no: int) -> dict:
 def get_gw_points(league_id: int, gw_no: int) -> pd.DataFrame:
     """
     Calculate points, rank, and H2H score for all managers in a gameweek.
-    
-    Parameters:
-        league_id (int): League ID.
-        gw_no (int): Gameweek number.
-    
-    Returns:
-        pd.DataFrame: Points table sorted by rank.
+    Handles managers who joined late by assigning None to missing data.
     """
     manager_ids = get_league_manager_id(league_id)
     data = {
-        'manager_id': manager_ids,
-        'gw_no': [gw_no] * len(manager_ids),
+        'manager_id': [],
+        'gw_no': [],
         'points': [],
         'transfers_cost': [],
         'active_chip': [],
         'points_on_bench': [],
     }
+
     for manager_id in manager_ids:
         picks = get_manager_picks(manager_id, gw_no)
-        data['points'].append(picks['entry_history']['points'])
-        data['transfers_cost'].append(picks['entry_history']['event_transfers_cost'])
-        data['active_chip'].append(picks['active_chip'])
-        data['points_on_bench'].append(picks['entry_history']['points_on_bench'])
+        
+        # Append manager info regardless of whether picks exist
+        data['manager_id'].append(manager_id)
+        data['gw_no'].append(gw_no)
+        
+        if picks:
+            # Extract data if picks are found
+            history = picks.get('entry_history', {})
+            data['points'].append(history.get('points', 0))
+            data['transfers_cost'].append(history.get('event_transfers_cost', 0))
+            data['active_chip'].append(picks.get('active_chip'))
+            data['points_on_bench'].append(history.get('points_on_bench', 0))
+        else:
+                    # Assign 0 instead of None to ensure math operations work later
+                    data['points'].append(0)
+                    data['transfers_cost'].append(0)
+                    data['active_chip'].append(None) # Chips are strings, None is fine here
+                    data['points_on_bench'].append(0)
+
     df = pd.DataFrame(data)
-    # df['rank'] = df['h2h_points'].rank(method='dense', ascending=False).astype(int)
-    # return df.sort_values(by='rank')
     return df
