@@ -1,23 +1,23 @@
 #!/bin/bash
-# Run reports for multiple leagues and gameweek
+# Run reports for active leagues and gameweek
 
-# Check if GW argument is provided
 if [ -z "$1" ]; then
-  echo "Usage: $0 <gameweek>"
+  echo "Usage: $0 <gameweek> [season]"
   exit 1
 fi
 
 GW=$1
+SEASON=${2:-"2026-2027"}
 
-LEAGUES=("rbsc" "rpk" "ifc")
+LEAGUES=("ifc" "rpk" "rbsc")
 
 for LEAGUE in "${LEAGUES[@]}"
 do
-    echo "Running main.py for league=$LEAGUE, gw=$GW..."
-    python scripts/main.py --league "$LEAGUE" --gw "$GW"
-
-    echo "Running report.py for league=$LEAGUE, gw=$GW..."
-    python scripts/report.py --league "$LEAGUE" --gw "$GW"
+    echo "========================================"
+    echo "Processing $LEAGUE for GW$GW (Season: $SEASON)"
+    echo "========================================"
+    python scripts/main.py --league "$LEAGUE" --gw "$GW" --season "$SEASON"
+    python scripts/report.py --league "$LEAGUE" --gw "$GW" --season "$SEASON"
 done
 
-echo "✅ All reports completed for gw=$GW"
+echo "✅ All reports completed for GW$GW ($SEASON)"
