@@ -48,14 +48,6 @@ class FPLClient:
 # Global singleton client instance
 _client = FPLClient()
 
-def get_something():
-    """
-    See sample api responses
-    """
-    r = _client.get(f"leagues-classic/481419")
-    r.raise_for_status()
-    return r.json()
-
 def get_gw_status():
     """
     Fetch the overall game status (e.g., current event, deadlines).

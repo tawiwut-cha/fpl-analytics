@@ -2,13 +2,15 @@ import os
 import pandas as pd
 from config import SEASON
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 def get_data_dir(league_name: str, season: str = None) -> str:
     """
     Returns the directory path for saving data based on the league name and season.
     Automatically creates the folder if it doesn't exist.
     """
     selected_season = season or SEASON
-    path = os.path.join('data', selected_season, league_name)
+    path = os.path.join(BASE_DIR, 'data', selected_season, league_name)
     os.makedirs(path, exist_ok=True)
     return path
 
@@ -18,7 +20,7 @@ def get_report_dir(league_name: str, season: str = None) -> str:
     Automatically creates the folder if it doesn't exist.
     """
     selected_season = season or SEASON
-    path = os.path.join('outputs', selected_season, 'report', league_name)
+    path = os.path.join(BASE_DIR, 'outputs', selected_season, 'report', league_name)
     os.makedirs(path, exist_ok=True)
     return path
 
